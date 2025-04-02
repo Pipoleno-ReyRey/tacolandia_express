@@ -48,6 +48,19 @@ namespace pedidos.Migrations
                     b.ToTable("Dish");
                 });
 
+            modelBuilder.Entity("DishesOrder", b =>
+                {
+                    b.Property<int>("dishId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("orderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("dishId", "orderId");
+
+                    b.ToTable("dishesOrders");
+                });
+
             modelBuilder.Entity("Ingredient", b =>
                 {
                     b.Property<int?>("Id")
@@ -94,9 +107,6 @@ namespace pedidos.Migrations
 
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("dishesOrded")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("nameCustomer")
                         .HasMaxLength(150)

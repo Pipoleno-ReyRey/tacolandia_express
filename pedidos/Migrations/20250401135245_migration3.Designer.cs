@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace pedidos.Migrations
 {
     [DbContext(typeof(OrdersDishDb))]
-    [Migration("20250330182944_migration2")]
-    partial class migration2
+    [Migration("20250401135245_migration3")]
+    partial class migration3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,6 +49,19 @@ namespace pedidos.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Dish");
+                });
+
+            modelBuilder.Entity("DishesOrder", b =>
+                {
+                    b.Property<int>("dishId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("orderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("dishId", "orderId");
+
+                    b.ToTable("dishesOrders");
                 });
 
             modelBuilder.Entity("Ingredient", b =>
@@ -97,9 +110,6 @@ namespace pedidos.Migrations
 
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("dishesOrded")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("nameCustomer")
                         .HasMaxLength(150)

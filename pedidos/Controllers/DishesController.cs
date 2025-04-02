@@ -6,53 +6,26 @@ using MySqlConnector;
 [Route("pedidos/")]
 public class DishesController : ControllerBase{
     private readonly OrdersDishDb ordersDishDb;
-    public DishesController(OrdersDishDb ordersDishDb){
+    private readonly DishesService dishesService;
+    public DishesController(OrdersDishDb ordersDishDb, DishesService dishesService){
         this.ordersDishDb = ordersDishDb;
+        this.dishesService = dishesService;
     }
 
     [HttpGet("getDishes")]
-    public async Task<List<Dish>> GetDishes(){
-        return await ordersDishDb.Dish.ToListAsync();
+    public async Task<List<DishDTO>> GetDishes(){
+        var dishesList = await ordersDishDb.Dish.ToListAsync();
+        return await dishesService.GetDishes(dishesList);
     }
 
     [HttpPost("postDish")]
     public async Task<DishDTO> PostDish([FromBody]DishDTO dishDTO){
-        var dish = dishDTO.GetDish();
-        var ingredients = await ordersDishDb.ingredients.ToListAsync();
-        var newIngredients = new List<Ingredient>();
-        try{
-            foreach(var ingrediente in dishDTO.ingredients!){
-            if(!ingredients.Any(ing => ing.name == ingrediente.name && ing.price == ingrediente.price)){
-                newIngredients.Add(ingrediente);
-                }
-            }
-
-            await ordersDishDb.ingredients.AddRangeAsync(newIngredients);
-            await ordersDishDb.Dish.AddAsync(dish);
-            await ordersDishDb.SaveChangesAsync();
-
-            var dishIngredients = new List<IngredientDish>();
-            ingredients = await ordersDishDb.ingredients.ToListAsync();
-            var idDish = dish.Id;
-            foreach(var ingrediente in dishDTO.ingredients!){
-                if(ingredients.Any(ing => ing.name == ingrediente.name && ing.price == ingrediente.price)){
-                    var idIngredient = ingredients.FirstOrDefault(ing => ing.name == ingrediente.name && ing.price == ingrediente.price)!.Id;
-                    var ingredientDish = new IngredientDish();
-                    ingredientDish.dishId = idDish;
-                    ingredientDish.ingredientId = idIngredient;
-                    dishIngredients.Add(ingredientDish);
-                }
-            }
-            
-            await ordersDishDb.AddRangeAsync(dishIngredients);
-            await ordersDishDb.SaveChangesAsync();
-
-        } catch(MySqlException error){
-            dish = new Dish();
-            dish.name = error.Message;
-        }
-        
-        return dishDTO;
+        return await dishesService.AddDish(dishDTO);
     }
 
+    [HttpDelete("deleteDish/{id}")]
+    public async Task<string> DeleteDish(int id){
+        await ordersDishDb.Dish.Where(d => d.Id == id).ExecuteDeleteAsync();
+        return "plato borrado";
+    }
 }

@@ -9,6 +9,8 @@ builder.Services.AddDbContext<OrdersDishDb>(db =>
     db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 
+builder.Services.AddScoped<DishesService>();
+builder.Services.AddScoped<OrderService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

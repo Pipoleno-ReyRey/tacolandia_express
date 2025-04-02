@@ -9,7 +9,6 @@ public class DishDTO
 
         public Dish GetDish(){
             var dish = new Dish();
-            dish.Id = Id;
             dish.name = name;
             dish.description = description;
             dish.price = price;
