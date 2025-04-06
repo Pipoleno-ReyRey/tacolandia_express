@@ -37,7 +37,7 @@ public class DishesService{
             await ordersDishDb.AddRangeAsync(dishIngredients);
             await ordersDishDb.SaveChangesAsync();
 
-        } catch(MySqlConnector.MySqlException error){
+        } catch(Exception error){
             dish = new Dish();
             dish.name = error.Message;
         }
@@ -45,27 +45,61 @@ public class DishesService{
     }
 
     public async Task<List<DishDTO>> GetDishes(List<Dish> dishesList){
-        var ingredientDish = await ordersDishDb.ingredientDishes.ToListAsync();
-        var ingredients = await ordersDishDb.ingredients.ToListAsync();
         var dishes = new List<DishDTO>();
-        foreach(Dish dish in dishesList){
-            List<Ingredient> ingredientsOfDish = new List<Ingredient>();
-            var ingredientsList = ingredientDish.Where(ing => ing.dishId == dish.Id).ToList();
-            foreach(IngredientDish ingredient in ingredientsList){
-                var ingredient_ = ingredients.FirstOrDefault(ing => ing.Id == ingredient.ingredientId)!;
-                ingredientsOfDish.Add(ingredient_);
-            }
-            DishDTO dishDTO = new DishDTO();
-            dishDTO.Id = dish.Id;
-            dishDTO.name = dish.name;
-            dishDTO.description = dish.description;
-            dishDTO.ingredients = ingredientsOfDish;
-            dishDTO.price = dish.price;
-            dishDTO.img = dish.img;
 
-            dishes.Add(dishDTO);
+        try{
+            var ingredientDish = await ordersDishDb.ingredientDishes.ToListAsync();
+            var ingredients = await ordersDishDb.ingredients.ToListAsync();
+            foreach(Dish dish in dishesList){
+                List<Ingredient> ingredientsOfDish = new List<Ingredient>();
+                var ingredientsList = ingredientDish.Where(ing => ing.dishId == dish.Id).ToList();
+                foreach(IngredientDish ingredient in ingredientsList){
+                    var ingredient_ = ingredients.FirstOrDefault(ing => ing.Id == ingredient.ingredientId)!;
+                    ingredientsOfDish.Add(ingredient_);
+                }
+                DishDTO dishDTO = new DishDTO();
+                dishDTO.Id = dish.Id;
+                dishDTO.name = dish.name;
+                dishDTO.description = dish.description;
+                dishDTO.ingredients = ingredientsOfDish;
+                dishDTO.price = dish.price;
+                dishDTO.img = dish.img;
+
+                dishes.Add(dishDTO);
+            }
+            return dishes;
+
+        }catch(Exception error){
+            dishes.Add(new DishDTO(){name = error.Message});
+            return dishes;
+        }
+    
+    }
+
+    public async Task<DishDTO> GetDish(int id){
+        try{
+            var dish = await ordersDishDb.Dish.FirstOrDefaultAsync(d => d.Id == id);
+            var dishIngredients = await ordersDishDb.ingredientDishes.Where(x => x.dishId == id).ToListAsync();
+            var ingredients = new List<Ingredient>();
+            foreach(var ingredients1 in dishIngredients){
+                ingredients.Add(ordersDishDb.ingredients.FirstOrDefault(x => x.Id == ingredients1.ingredientId)!);
+            }
+            return new DishDTO(){Id = id, name = dish!.name, description = dish.description, ingredients = ingredients, price = dish.price, img = dish.img};
+        
+        } catch (Exception error){
+            return new DishDTO(){name = error.Message};
+        }
+    }
+
+    public async Task<string> DeleteDish(int id){
+        try{
+            await ordersDishDb.Dish.Where(x => x.Id == id).ExecuteDeleteAsync();
+            await ordersDishDb.dishesOrders.Where(x => x.dishId == id).ExecuteDeleteAsync();
+            await ordersDishDb.ingredientDishes.Where(x => x.dishId == id).ExecuteDeleteAsync();
+            return "eliminado"; 
+        }catch(Exception error){
+            return error.Message;
         }
 
-        return dishes;
-    }
+    } 
 }

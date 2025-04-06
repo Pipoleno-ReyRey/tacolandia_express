@@ -10,12 +10,35 @@ public class OrdersController: ControllerBase{
     }
 
     [HttpPost("postOrders")]
-    public async Task<Order> GetOrders([FromBody] OrderDTO orderDTO){
-        return await orderService.PostOrder(orderDTO);
+    public async Task<IActionResult> PostOrder([FromBody] OrderDTO orderDTO){
+        return Ok(await orderService.PostOrder(orderDTO));
     }
 
     [HttpGet("getOrders")]
-    public async Task<List<OrderDTO>> GetOrders(){
-        return await orderService.GetOrders();
+    public async Task<ActionResult<List<OrderDTO>>> GetOrders(){
+        if(!(await orderService.GetOrders()).Any(x => x.id == null)){
+            return Ok(await orderService.GetOrders());
+        } else{
+            return BadRequest((await orderService.GetOrders())[0].customer);
+        }
+        
+    }
+
+    [HttpDelete("deleteOrder/{id}")]
+    public async Task<IActionResult> DeleteOrder(int id){
+        if(await orderService.DeleteOrder(id) == "eliminado"){
+            return Ok(await orderService.DeleteOrder(id));
+        } else {
+            return BadRequest(await orderService.DeleteOrder(id));
+        }
+    }
+
+    [HttpGet("getOrder/{id}")]
+    public async Task<ActionResult<OrderDTO>> GetOrder(int id){
+        if((await orderService.GetOrder(id)).id != null){
+            return Ok(await orderService.GetOrder(id));
+        } else{
+            return BadRequest((await orderService.GetOrder(id)).customer);
+        }
     }
 }
