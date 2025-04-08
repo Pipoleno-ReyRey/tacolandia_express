@@ -84,7 +84,11 @@ public class DishesService{
             foreach(var ingredients1 in dishIngredients){
                 ingredients.Add(ordersDishDb.ingredients.FirstOrDefault(x => x.Id == ingredients1.ingredientId)!);
             }
-            return new DishDTO(){Id = id, name = dish!.name, description = dish.description, ingredients = ingredients, price = dish.price, img = dish.img};
+            if(dish == null){
+                return new DishDTO(){name = "no encontrado"};
+            } else{
+                return new DishDTO(){Id = id, name = dish!.name, description = dish.description, ingredients = ingredients, price = dish.price, img = dish.img};
+            }
         
         } catch (Exception error){
             return new DishDTO(){name = error.Message};

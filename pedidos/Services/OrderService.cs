@@ -102,11 +102,17 @@ public class OrderService{
                 order.dishes!.Add(new DishDTO(){Id = dishDB!.Id, name = dishDB.name, description = dishDB.description, ingredients = ingredientsList, img = dishDB.img, price = dishDB.price});
             }
 
-            order.id = orderDB!.id;
-            order.customer = orderDB.nameCustomer;
-            order.count = orderDB.count;
-            order.date = orderDB.date;
-            return order;
+            if(orderDB == null){
+                order.customer = "no encontrado";
+                return order;
+            } else{
+                order.id = orderDB!.id;
+                order.customer = orderDB.nameCustomer;
+                order.count = orderDB.count;
+                order.date = orderDB.date;
+                return order;
+            }
+            
         } catch(Exception error){
             order.customer = error.Message;
             return order;
