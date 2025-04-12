@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ public class OrdersController: ControllerBase{
     }
 
     [HttpGet("getOrders")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<List<OrderDTO>>> GetOrders(){
         if(!(await orderService.GetOrders()).Any(x => x.id == null)){
             return Ok(await orderService.GetOrders());

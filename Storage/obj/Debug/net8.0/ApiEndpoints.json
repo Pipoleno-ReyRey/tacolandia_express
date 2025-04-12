@@ -1,0 +1,28 @@
+[
+  {
+    "ContainingType": "Storage.Controllers.StorageController",
+    "Method": "GetItems",
+    "RelativePath": "storage/items",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Storage.Controllers.StorageController",
+    "Method": "PostItems",
+    "RelativePath": "storage/postItem",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "item",
+        "Type": "Storage.Models.Items",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
@@ -31,11 +32,13 @@ public class DishesController : ControllerBase{
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("postDish")]
     public async Task<IActionResult> PostDish([FromBody]DishDTO dishDTO){
         return Ok(await dishesService.AddDish(dishDTO));
     }
-
+    
+    [Authorize(Roles = "Admin")]
     [HttpDelete("deleteDish/{id}")]
     public async Task<ActionResult<string>> DeleteDish(int id){
         if(await dishesService.DeleteDish(id) == "eliminar"){
